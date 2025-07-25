@@ -10,13 +10,17 @@ import EditCar from "./pages/UpdateCar";
 import RentForm from "./pages/RentForn";
 import Notifications from "./pages/Notifications";
 import NotificationsUser from "./pages/NotificationsUser";
+import Comments from "./pages/Comments";
+import About from "./pages/About";
+import UserAccount from "./pages/UserAccount";
+import AdminLayout from "./pages/AdminLayout";
 
 
 
 function App() {
 
   return (
-    
+
     <div>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -28,7 +32,15 @@ function App() {
         <Route path="/rent/:carId" element={<RentForm />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/notifications-user" element={<NotificationsUser />} />
-        
+        <Route path="/comments" element={<Comments />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/useraccount" element={<UserAccount />} />
+        <Route path="/admin" element={
+          <RequireAdmin>
+            <AdminLayout />
+          </RequireAdmin>
+        }></Route>
+
       </Routes>
     </div>
   );

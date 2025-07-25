@@ -23,11 +23,7 @@ export default function Login() {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        localStorage.setItem('user', JSON.stringify({
-          name: data.username,
-          avatar: data.image || "https://ui-avatars.com/api/?name=" + encodeURIComponent(data.username) + "&background=2563eb&color=fff&size=64",
-          role: data.role
-        }));
+        localStorage.setItem('user', JSON.stringify(data));
         navigate('/');
       } else {
         setError(data.message || 'Invalid credentials');

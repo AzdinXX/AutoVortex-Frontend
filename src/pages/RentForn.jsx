@@ -12,6 +12,7 @@ function RentForm() {
 
   useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
+        console.log("User from localStorage:", user);
         if (user) {
             setUserId(user.id);
         }
@@ -20,14 +21,19 @@ function RentForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!userId || !carId) {
-      alert("Missing user or car ID.");
+    if (!userId ) {
+      alert("Missing userID.");
+      return;
+    }
+
+    if (!carId ) {
+      alert("Missing car id.");
       return;
     }
 
     try {
       await axios.post('http://localhost:3000/api/rentals', {
-        user_id: userId,
+        user_id: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).id : null,
         car_id: carId,
         start_date: startDate,
         end_date: endDate,

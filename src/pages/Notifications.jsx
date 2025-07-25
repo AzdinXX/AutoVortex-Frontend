@@ -6,6 +6,16 @@ function Notifications() {
     const [notifications, setNotifications] = useState([]);
     const [notifCount, setNotifCount] = useState(0);
     const navigate = useNavigate();
+    
+    const handleDelete = async (id) => {
+     try {
+       await axios.delete(`http://localhost:3000/api/notifications/${id}`);
+       fetchNotifications();
+       fetchNotifCount();
+     } catch (err) {
+       console.error("Failed to delete notification", err);
+     }
+   };
 
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem("user"));
@@ -48,30 +58,70 @@ function Notifications() {
     };
 
     return (
-        <div>
+        <div className="notifications-page" style={{ minHeight: '100vh', background: 'linear-gradient(120deg, #0a192f 0%, #1e293b 100%)', fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
             <style>{`
-                .nav-bell {
-                    position: relative;
-                    font-size: 1.7rem;
-                    color: #2563eb;
-                    margin-right: 18px;
-                    cursor: pointer;
+                .notif-glass-card {
+                    background: rgba(30, 41, 59, 0.85);
+                    border-radius: 18px;
+                    box-shadow: 0 4px 24px rgba(30,64,175,0.12);
+                    border: 1px solid rgba(59,130,246,0.08);
+                    transition: transform 0.2s, box-shadow 0.2s;
                 }
-                .nav-bell .notif-count {
-                    position: absolute;
-                    top: -6px;
-                    right: -10px;
+                .notif-glass-card:hover {
+                    transform: translateY(-4px) scale(1.01);
+                    box-shadow: 0 12px 32px rgba(30,64,175,0.18);
+                }
+                .notif-header {
+                    background: linear-gradient(90deg, #2563eb 0%, #1e293b 100%);
+                    color: #fff;
+                    border-bottom-left-radius: 18px;
+                    border-bottom-right-radius: 18px;
+                    box-shadow: 0 2px 10px rgba(30,64,175,0.10);
+                }
+                .notif-avatar {
+                    width: 64px;
+                    height: 64px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #2563eb;
+                    background: #fff;
+                    margin-bottom: 10px;
+                }
+                .notif-status {
+                    font-weight: bold;
+                    text-transform: capitalize;
+                    padding: 2px 12px;
+                    border-radius: 12px;
+                    font-size: 0.95rem;
+                }
+                .notif-status.pending {
+                    background: #facc15;
+                    color: #1e293b;
+                }
+                .notif-status.accepted {
+                    background: #22c55e;
+                    color: #fff;
+                }
+                .notif-status.rejected {
                     background: #dc2626;
                     color: #fff;
-                    border-radius: 50%;
-                    font-size: 0.85rem;
-                    padding: 2px 7px;
-                    font-weight: bold;
-                    box-shadow: 0 2px 8px rgba(220,38,38,0.18);
+                }
+                .notif-action-btn {
+                    border-radius: 30px;
+                    font-weight: 500;
+                    min-width: 110px;
+                    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+                }
+                .notif-action-btn.btn-dark:hover {
+                    background: #2563eb;
+                    color: #fff;
+                }
+                .notif-action-btn.btn-danger:hover {
+                    background: #991b1b;
                 }
             `}</style>
-            <nav className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom mb-4 bg-white shadow-sm">
-                <span className="fw-bold fs-4 text-primary">Admin Notifications</span>
+            <nav className="notif-header d-flex align-items-center justify-content-between px-4 py-3 mb-5 shadow-lg" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+                <span className="fw-bold fs-3">Admin Notifications</span>
                 <NavLink to="/notifications" className="nav-bell" title="Notifications">
                     <i className="bi bi-bell"></i>
                     {notifCount > 0 && (
@@ -79,34 +129,49 @@ function Notifications() {
                     )}
                 </NavLink>
             </nav>
-            <div className="p-4">
-                <h2 className="text-xl font-bold mb-4">Rental Requests</h2>
+            <div className="container py-4">
+                <h2 className="text-white fw-bold mb-4 text-center" style={{ letterSpacing: '1px' }}>Rental Requests</h2>
+                <div className="row justify-content-center">
+                {notifications.length === 0 && (
+                    <div className="col-12 text-center text-light fs-5 py-5">No notifications to display.</div>
+                )}
                 {notifications.map((n) => (
-                    <div key={n.id} className="border p-4 mb-4 rounded-md shadow">
-                        {n.user_image && (
-                            <img
-                                src={`http://localhost:3000/uploads/${n.user_image}`}
-                                alt="User"
-                                className="w-16 h-16 rounded-full mb-2 object-cover"
-                            />
-                        )}
-
-                        <p><strong>User:</strong> {n.user_name}</p>
-                        <p><strong>Phone:</strong> {n.user_phone || "Not provided"}</p>
-                        <p><strong>Car:</strong> {n.car_name}</p>
-                        <p><strong>Message:</strong> {n.message}</p>
-                        <p><strong>Start Date:</strong> {new Date(n.start_date).toLocaleDateString('en-GB')}</p>
-                        <p><strong>End Date:</strong> {new Date(n.end_date).toLocaleDateString('en-GB')}</p>
-                        <p><strong>Status:</strong> {n.status}</p>
-
-                        {n.status === "pending" && (
-                            <div className="flex gap-2 mt-3">
-                                <button className="btn btn-dark" onClick={() => handleAccept(n.id)}>Accept</button>
-                                <button className="btn btn-danger" onClick={() => handleReject(n.id)}>Reject</button>
+                    <div key={n.id} className="col-md-7 mb-4">
+                        <div className="notif-glass-card p-4 shadow-lg">
+                            <div className="d-flex align-items-center mb-3">
+                                {n.user_image && (
+                                    <img
+                                        src={`http://localhost:3000/uploads/${n.user_image}`}
+                                        alt="User"
+                                        className="notif-avatar me-3"
+                                    />
+                                )}
+                                <div>
+                                    <span className={`notif-status ${n.status}`}>{n.status}</span>
+                                </div>
                             </div>
-                        )}
+                            <div className="text-light mb-2"><strong>User:</strong> {n.user_name}</div>
+                            <div className="text-light mb-2"><strong>Phone:</strong> {n.user_phone || "Not provided"}</div>
+                            <div className="text-light mb-2"><strong>Car:</strong> {n.car_name}</div>
+                            <div className="text-light mb-2"><strong>Message:</strong> {n.message}</div>
+                            <div className="text-light mb-2"><strong>Start Date:</strong> {new Date(n.start_date).toLocaleDateString('en-GB')}</div>
+                            <div className="text-light mb-2"><strong>End Date:</strong> {new Date(n.end_date).toLocaleDateString('en-GB')}</div>
+                            {n.status === "pending" && (
+                                <div className="d-flex gap-3 mt-4">
+                                    <button className="btn btn-dark notif-action-btn" onClick={() => handleAccept(n.id)}>Accept</button>
+                                    <button className="btn btn-danger notif-action-btn" onClick={() => handleReject(n.id)}>Reject</button>
+                                    <button className="btn btn-outline-danger notif-action-btn" onClick={() => handleDelete(n.id)}>Delete</button>
+                                </div>
+                            )}
+                            {n.status !== "pending" && (
+                                <div className="d-flex gap-3 mt-4">
+                                    <button className="btn btn-outline-danger notif-action-btn" onClick={() => handleDelete(n.id)}>Delete</button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 ))}
+                </div>
             </div>
         </div>
     );

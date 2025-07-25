@@ -2,32 +2,49 @@ import { useState, useEffect } from 'react';
 import { Container, Button, Row, Col, Navbar, Nav, Card, Carousel, Dropdown, Image } from 'react-bootstrap';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Bell } from 'lucide-react';
+
 
 export default function Home() {
-  const [activeKey, setActiveKey] = useState('home'); 
+  const [activeKey, setActiveKey] = useState('home');
   const [user, setUser] = useState(null);
+const [notificationCount, setNotificationCount] = useState(0);
   const [notifCount, setNotifCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     setUser(storedUser);
-
-    // Fetch notification count if user exists
     if (storedUser) {
       const url = storedUser.role === "admin"
         ? "http://localhost:3000/api/notifications/unread"
         : `http://localhost:3000/api/notifications/user/${storedUser.id}/unread`;
       fetch(url)
         .then(res => res.json())
-        .then(data => setNotifCount(data.count || 0))
+       .then(data => setNotifCount(Array.isArray(data) ? data.length : 0))
         .catch(() => setNotifCount(0));
     }
   }, []);
+useEffect(() => {
+  const fetchNotifications = async () => {
+    if (user && user.id) {
+      try {
+        const res = await axios.get(`http://localhost:3000/api/notifications/user/${user.id}/unread`);
+        setNotificationCount(res.data.unreadCount);
+      } catch (error) {
+        console.error('Error fetching notifications', error);
+      }
+    }
+  };
+
+  fetchNotifications();
+  const interval = setInterval(fetchNotifications, 10000);
+  return () => clearInterval(interval);
+}, [user]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) return; // Don't fetch if user is missing
+    if (!user) return; 
 
     if (user.role === "admin") {
       fetchNotifCountAdmin();
@@ -284,25 +301,38 @@ export default function Home() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto" activeKey={activeKey} onSelect={setActiveKey}>
               <NavLink to="/home" className="nav-link text-white mx-2">Home</NavLink>
-              <Nav.Link eventKey="cars" className="text-white mx-2">Cars</Nav.Link>
+              <Nav.Link to="/auto_options" eventKey="cars" className="text-white mx-2">Cars</Nav.Link>
               <Nav.Link eventKey="offers" className="text-white mx-2">Offers</Nav.Link>
-              <Nav.Link eventKey="about" className="text-white mx-2">About</Nav.Link>
-              <Nav.Link eventKey="contact" className="text-white mx-2">Contact</Nav.Link>
+              <NavLink to="/about" className="nav-link text-white mx-2">About</NavLink>
+              <NavLink to="/comments" className="nav-link text-white mx-2">Comments</NavLink>
               {!user && (
                 <Button as={Link} to="/login" variant="outline-light" className="ms-3 px-4 d-lg-none">Login</Button>
               )}
             </Nav>
-            {/* Notification Bell */}
             {user && (
-              <Nav className="ms-2">
+              <Nav className="ms-2 align-items-center">
                 <NavLink
                   to={user.role === "admin" ? "/notifications" : "/notifications-user"}
-                  className="nav-bell nav-link"
+                  className="nav-bell nav-link d-flex align-items-center position-relative"
                   title="Notifications"
+                  style={{ padding: 0, marginRight: '18px' }}
                 >
-                  <i className="bi bi-bell"></i>
-                  {notifCount > 0 && (
-                    <span className="notif-count">{notifCount}</span>
+                  <Bell size={28} color="#fff" />
+                  {(notifCount > 0 || notificationCount > 0) && (
+                    <span className="notif-count" style={{
+                      position: 'absolute',
+                      top: '-6px',
+                      right: '-10px',
+                      background: '#dc2626',
+                      color: '#fff',
+                      borderRadius: '50%',
+                      fontSize: '0.85rem',
+                      padding: '2px 7px',
+                      fontWeight: 'bold',
+                      zIndex: 2
+                    }}>
+                      {notificationCount > 0 ? notificationCount : notifCount}
+                    </span>
                   )}
                 </NavLink>
               </Nav>
@@ -326,8 +356,8 @@ export default function Home() {
               <Dropdown.Menu>
                 {user ? (
                   <>
-                    <Dropdown.Header>{user.name}</Dropdown.Header>
-                    <Dropdown.Item as={Link} to="/account">Edit Account</Dropdown.Item>
+                    <Dropdown.Header>{user.username}</Dropdown.Header>
+                    <Dropdown.Item as={Link} to="/useraccount">Edit Account of </Dropdown.Item>
                     <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                   </>
                 ) : (

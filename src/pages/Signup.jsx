@@ -45,15 +45,12 @@ export default function Signup() {
       if (formData.image) {
         data.append('image', formData.image);
       }
-
       const res = await axios.post('http://localhost:3000/register', data);
       setSuccess(res.data.message);
-      const user = {
-        name: formData.username,
-        avatar: "https://ui-avatars.com/api/?name=" + encodeURIComponent(formData.username) + "&background=2563eb&color=fff&size=64"
-      };
-      localStorage.setItem('user', JSON.stringify(user));
-      navigate('/home');
+      if (res.data && res.data.user) {
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
+      navigate('/');
     } catch (error) {
       setError(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
