@@ -11,71 +11,36 @@ function AdminComments() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null);
 
-  // Mock data for comments since we don't have a comments backend
-  const mockComments = [
-    {
-      id: 1,
-      user_name: "John Doe",
-      user_email: "john@example.com",
-      car_brand: "Toyota",
-      car_model: "Camry",
-      rating: 5,
-      comment: "Excellent service! The car was in perfect condition and the rental process was smooth. Highly recommend!",
-      created_at: "2024-01-15T10:30:00Z",
-      status: "approved"
-    },
-    {
-      id: 2,
-      user_name: "Sarah Smith",
-      user_email: "sarah@example.com",
-      car_brand: "BMW",
-      car_model: "X5",
-      rating: 4,
-      comment: "Great experience overall. The car was clean and well-maintained. Only minor issue was the GPS navigation.",
-      created_at: "2024-01-14T15:45:00Z",
-      status: "pending"
-    },
-    {
-      id: 3,
-      user_name: "Mike Johnson",
-      user_email: "mike@example.com",
-      car_brand: "Mercedes",
-      car_model: "C-Class",
-      rating: 5,
-      comment: "Outstanding service! The staff was very professional and the car exceeded my expectations. Will definitely use again.",
-      created_at: "2024-01-13T09:20:00Z",
-      status: "approved"
-    },
-    {
-      id: 4,
-      user_name: "Emily Brown",
-      user_email: "emily@example.com",
-      car_brand: "Honda",
-      car_model: "Civic",
-      rating: 3,
-      comment: "The car was okay but there were some scratches that weren't mentioned. Service was average.",
-      created_at: "2024-01-12T14:15:00Z",
-      status: "rejected"
-    }
-  ];
-
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setComments(mockComments);
-      setLoading(false);
-    }, 1000);
+    fetchComments();
   }, []);
+
+  const fetchComments = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await axios.get("http://localhost:3000/api/comments");
+      setComments(res.data);
+    } catch (err) {
+      setError("Failed to fetch comments");
+    }
+    setLoading(false);
+  };
 
   const handleView = (comment) => {
     setSelectedComment(comment);
     setShowViewModal(true);
   };
 
-  const handleDelete = (commentId) => {
+  const handleDelete = async (commentId) => {
     if (window.confirm('Are you sure you want to delete this comment?')) {
-      setComments(comments.filter(comment => comment.id !== commentId));
-      setSuccess('Comment deleted successfully!');
+      try {
+        await axios.delete(`http://localhost:3000/api/comments/${commentId}`);
+        setSuccess('Comment deleted successfully!');
+        fetchComments();
+      } catch (err) {
+        setError('Failed to delete comment');
+      }
     }
   };
 
@@ -246,11 +211,9 @@ function AdminComments() {
                   <thead>
                     <tr>
                       <th>User</th>
-                      <th>Car</th>
                       <th>Rating</th>
                       <th>Comment</th>
                       <th>Date</th>
-                      <th>Status</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -261,13 +224,9 @@ function AdminComments() {
                           <div className="d-flex align-items-center">
                             <User size={20} className="me-2" />
                             <div>
-                              <div className="fw-bold">{comment.user_name}</div>
-                              <small className="text-muted">{comment.user_email}</small>
+                              <div className="fw-bold">{comment.username}</div>
                             </div>
                           </div>
-                        </td>
-                        <td>
-                          <strong>{comment.car_brand} {comment.car_model}</strong>
                         </td>
                         <td>
                           <div className="d-flex align-items-center">
@@ -285,9 +244,6 @@ function AdminComments() {
                             <Calendar size={16} className="me-2" />
                             {formatDate(comment.created_at)}
                           </div>
-                        </td>
-                        <td>
-                          {getStatusBadge(comment.status)}
                         </td>
                         <td>
                           <Button
@@ -335,29 +291,17 @@ function AdminComments() {
                 <div className="user-info">
                   <User size={24} />
                   <div>
-                    <h6 className="mb-0">{selectedComment.user_name}</h6>
-                    <small className="text-muted">{selectedComment.user_email}</small>
+                    <h6 className="mb-0">{selectedComment.username}</h6>
                   </div>
                 </div>
-
                 <div className="rating-display">
                   <span className="fw-bold me-2">Rating:</span>
                   {getRatingStars(selectedComment.rating)}
                   <span className="ms-2 fw-bold">{selectedComment.rating}/5</span>
                 </div>
-
-                <div className="mb-3">
-                  <strong>Car:</strong> {selectedComment.car_brand} {selectedComment.car_model}
-                </div>
-
                 <div className="mb-3">
                   <strong>Date:</strong> {formatDate(selectedComment.created_at)}
                 </div>
-
-                <div className="mb-3">
-                  <strong>Status:</strong> {getStatusBadge(selectedComment.status)}
-                </div>
-
                 <div>
                   <strong>Comment:</strong>
                   <p className="mt-2 mb-0">{selectedComment.comment}</p>

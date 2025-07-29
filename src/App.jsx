@@ -26,6 +26,7 @@ import AdminOffers from "./pages/AdminOffers";
 import AdminComments from "./pages/AdminComments";
 
 import { useState, useEffect } from 'react';
+import AdminRoute from "./components/AdminRoute";
 
 
 function App() {
@@ -43,16 +44,25 @@ function App() {
   return (
     <AdminProvider>
       <div>
-        <Saidbar />
+        {user && user.role === 'admin' && <Saidbar />}
         <Routes>
+          
           <Route path="/" element={<Home />} />
           <Route path="/Signup" element={<Signup />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/auto_options" element={<Auto_Options />} />
-          <Route path="/add-car" element={<AddCar />} />
-          <Route path="/edit-car/:id" element={<EditCar />} />
+          <Route path="/add-car" element={
+        <AdminRoute user={user}>
+          <AddCar />
+        </AdminRoute> 
+        } />
+          <Route path="/edit-car/:id" element={<AdminRoute user={user}>
+          < EditCar/>
+        </AdminRoute>} />
           <Route path="/rent/:carId" element={<RentForm />} />
-          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/notifications" element={<AdminRoute user={user}>
+          <Notifications />
+        </AdminRoute> } />
           <Route path="/notifications-user" element={<NotificationsUser />} />
           <Route path="/comments" element={<Comments />} />
           <Route path="/about" element={<About />} />
@@ -60,10 +70,21 @@ function App() {
           <Route path="/offers" element={<Offers />} />
           
           {/* Admin Sidebar Routes */}
-          <Route path="/admin/add-car" element={<AdminAddCar />} />
-          <Route path="/admin/manage-cars" element={<AdminManageCars />} />
-          <Route path="/admin/offers" element={<AdminOffers />} />
-          <Route path="/admin/comments" element={<AdminComments />} />
+          <Route path="/admin/dashboard" element={<AdminRoute />} />
+          <Route path="/admin/add-car" element={<AdminRoute user={user}>
+          <AdminAddCar />
+        </AdminRoute> } />
+          <Route path="/admin/manage-cars" element={<AdminRoute user={user}>
+          <AdminManageCars />
+        </AdminRoute> } />
+          <Route path="/admin/offers" element={<AdminRoute user={user}>
+          <AdminOffers />
+        </AdminRoute> } />
+          <Route path="/admin/comments" element={<AdminRoute user={user}>
+          <AdminComments />
+        </AdminRoute> } />
+          
+          
         </Routes>
       </div>
     </AdminProvider>

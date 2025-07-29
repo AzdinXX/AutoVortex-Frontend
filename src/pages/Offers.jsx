@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Badge, Button, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { Clock, Star, Tag, Calendar, MapPin } from 'lucide-react';
+import { Clock, Star, Tag, Calendar, MapPin, Plus } from 'lucide-react';
 import axios from 'axios';
 
 function Offers() {
