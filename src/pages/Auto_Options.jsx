@@ -265,7 +265,7 @@ function Auto_Options() {
               <Nav.Link as={NavLink} to="/auto_options">Cars</Nav.Link>
               <Nav.Link as={NavLink} to="/offers">Offers</Nav.Link>
               <Nav.Link as={NavLink} to="/about">About</Nav.Link>
-              <Nav.Link as={NavLink} to="/contact">Contact</Nav.Link>
+              <Nav.Link as={NavLink} to="/comments">Comments</Nav.Link>
               <Button as={Link} to="/login" variant="outline-light" className="ms-3 px-4">Login</Button>
             </Nav>
           </Navbar.Collapse>

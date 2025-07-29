@@ -19,98 +19,11 @@ function Offers() {
       setLoading(true);
       setError('');
       
-      const response = await axios.get('http://localhost:3000/api/offers');
+      const response = await axios.get('http://localhost:3000/offers');
       setOffers(response.data);
     } catch (err) {
-      console.log('API not available, using mock data');
-      const mockOffers = [
-        {
-          id: 1,
-          title: "Weekend Special",
-          description: "Get 25% off on all luxury cars for weekend rentals",
-          discount_percentage: 25,
-          original_price: 150,
-          discounted_price: 112.50,
-          valid_until: "2024-12-31",
-          car_type: "Luxury",
-          image_url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&h=300&fit=crop",
-          features: ["Free Insurance", "24/7 Support", "Flexible Pickup"],
-          rating: 4.8,
-          review_count: 124
-        },
-        {
-          id: 2,
-          title: "Student Discount",
-          description: "Special rates for students with valid ID",
-          discount_percentage: 30,
-          original_price: 80,
-          discounted_price: 56,
-          valid_until: "2024-11-30",
-          car_type: "Economy",
-          image_url: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=500&h=300&fit=crop",
-          features: ["Student ID Required", "Unlimited Mileage", "Roadside Assistance"],
-          rating: 4.6,
-          review_count: 89
-        },
-        {
-          id: 3,
-          title: "Long Term Rental",
-          description: "Save big on rentals longer than 7 days",
-          discount_percentage: 40,
-          original_price: 200,
-          discounted_price: 120,
-          valid_until: "2024-12-15",
-          car_type: "SUV",
-          image_url: "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=500&h=300&fit=crop",
-          features: ["7+ Days", "Free Maintenance", "GPS Included"],
-          rating: 4.9,
-          review_count: 203
-        },
-        {
-          id: 4,
-          title: "First Time User",
-          description: "Welcome offer for new customers",
-          discount_percentage: 50,
-          original_price: 100,
-          discounted_price: 50,
-          valid_until: "2024-10-31",
-          car_type: "Sedan",
-          image_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500&h=300&fit=crop",
-          features: ["New Users Only", "No Hidden Fees", "Easy Booking"],
-          rating: 4.7,
-          review_count: 156
-        },
-        {
-          id: 5,
-          title: "Business Travel",
-          description: "Corporate rates for business travelers",
-          discount_percentage: 20,
-          original_price: 120,
-          discounted_price: 96,
-          valid_until: "2024-12-20",
-          car_type: "Business",
-          image_url: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=500&h=300&fit=crop",
-          features: ["Business Account", "Priority Service", "Invoice Available"],
-          rating: 4.8,
-          review_count: 178
-        },
-        {
-          id: 6,
-          title: "Family Package",
-          description: "Perfect for family trips with spacious vehicles",
-          discount_percentage: 35,
-          original_price: 180,
-          discounted_price: 117,
-          valid_until: "2024-11-15",
-          car_type: "Family",
-          image_url: "https://images.unsplash.com/photo-1549924231-f129b911e442?w=500&h=300&fit=crop",
-          features: ["Child Seats Available", "Family Friendly", "Extra Space"],
-          rating: 4.9,
-          review_count: 234
-        }
-      ];
-      
-      setOffers(mockOffers);
+      setError('Failed to fetch offers');
+      console.error('Error fetching offers:', err);
     } finally {
       setLoading(false);
     }
@@ -130,6 +43,24 @@ function Offers() {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const parseFeatures = (features) => {
+    try {
+      return typeof features === 'string' ? JSON.parse(features) : features;
+    } catch {
+      return [];
+    }
+  };
+
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) {
+      return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&h=300&fit=crop';
+    }
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    return `http://localhost:3000/uploads/${imageUrl}`;
   };
 
   if (loading) {
@@ -308,7 +239,7 @@ function Offers() {
                 <Card className="offer-card">
                   <div 
                     className="offer-image"
-                    style={{ backgroundImage: `url(${offer.image_url})` }}
+                    style={{ backgroundImage: `url(${getImageUrl(offer.image_url)})` }}
                   >
                     <div className="discount-badge">
                       -{offer.discount_percentage}% OFF
@@ -352,7 +283,7 @@ function Offers() {
                     </div>
 
                     <ul className="offer-features">
-                      {offer.features.map((feature, index) => (
+                      {parseFeatures(offer.features).map((feature, index) => (
                         <li key={index}>
                           <Tag size={14} className="me-2" />
                           {feature}

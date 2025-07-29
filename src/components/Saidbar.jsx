@@ -265,6 +265,15 @@ export default function AdminSidebar() {
           </div>
           
           <Link 
+            to="/admin/add-offer" 
+            className="sidebar-link"
+            onClick={closeSidebar}
+          >
+            <Plus size={22} />
+            Add New Offer
+          </Link>
+          
+          <Link 
             to="/admin/offers" 
             className="sidebar-link"
             onClick={closeSidebar}

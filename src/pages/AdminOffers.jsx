@@ -1,72 +1,44 @@
 import { useState, useEffect } from 'react';
 import { Container, Card, Row, Col, Button, Alert, Badge } from 'react-bootstrap';
 import { Tag, Plus, Edit, Trash2, Calendar, DollarSign, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function AdminOffers() {
+  const navigate = useNavigate();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  // Mock data for offers since we removed the backend offers functionality
-  const mockOffers = [
-    {
-      id: 1,
-      title: "Summer Special",
-      description: "Get 20% off on all luxury cars this summer",
-      discount_percentage: 20,
-      original_price: 100,
-      discounted_price: 80,
-      valid_until: "2024-08-31",
-      car_type: "Luxury",
-      image_url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=250&fit=crop",
-      features: ["Free GPS", "Unlimited Mileage", "24/7 Support"],
-      rating: 4.8,
-      review_count: 156,
-      is_active: true
-    },
-    {
-      id: 2,
-      title: "Weekend Warrior",
-      description: "Special weekend rates for economy cars",
-      discount_percentage: 15,
-      original_price: 60,
-      discounted_price: 51,
-      valid_until: "2024-07-31",
-      car_type: "Economy",
-      image_url: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=250&fit=crop",
-      features: ["Fuel Efficient", "Easy Parking", "Low Cost"],
-      rating: 4.5,
-      review_count: 89,
-      is_active: true
-    },
-    {
-      id: 3,
-      title: "Business Traveler",
-      description: "Premium service for business travelers",
-      discount_percentage: 25,
-      original_price: 120,
-      discounted_price: 90,
-      valid_until: "2024-09-30",
-      car_type: "Premium",
-      image_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=250&fit=crop",
-      features: ["Business Class", "Priority Booking", "Concierge Service"],
-      rating: 4.9,
-      review_count: 234,
-      is_active: true
-    }
-  ];
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setOffers(mockOffers);
-      setLoading(false);
-    }, 1000);
+    fetchOffers();
   }, []);
 
-  const handleDelete = (offerId) => {
+  const fetchOffers = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await axios.get('http://localhost:3000/api/offers');
+      setOffers(response.data);
+    } catch (err) {
+      setError('Failed to fetch offers');
+      console.error('Error fetching offers:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (offerId) => {
     if (window.confirm('Are you sure you want to delete this offer?')) {
-      setOffers(offers.filter(offer => offer.id !== offerId));
+      try {
+        await axios.delete(`http://localhost:3000/api/offers/${offerId}`);
+        setSuccess('Offer deleted successfully!');
+        fetchOffers(); // Refresh the list
+      } catch (err) {
+        setError('Failed to delete offer');
+        console.error('Error deleting offer:', err);
+      }
     }
   };
 
@@ -76,6 +48,24 @@ function AdminOffers() {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const parseFeatures = (features) => {
+    try {
+      return typeof features === 'string' ? JSON.parse(features) : features;
+    } catch {
+      return [];
+    }
+  };
+
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) {
+      return 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&h=250&fit=crop';
+    }
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    return `http://localhost:3000/uploads/${imageUrl}`;
   };
 
   if (loading) {
@@ -229,7 +219,10 @@ function AdminOffers() {
                 <h1 className="page-title">Manage Offers</h1>
                 <p className="page-subtitle">Create and manage promotional offers</p>
               </div>
-              <Button className="add-offer-btn">
+              <Button 
+                className="add-offer-btn"
+                onClick={() => navigate('/admin/add-offer')}
+              >
                 <Plus size={20} className="me-2" />
                 Add New Offer
               </Button>
@@ -244,13 +237,19 @@ function AdminOffers() {
                 </Alert>
               )}
 
+              {success && (
+                <Alert variant="success" onClose={() => setSuccess('')} dismissible>
+                  {success}
+                </Alert>
+              )}
+
               <Row className="g-4">
                 {offers.map((offer) => (
                   <Col key={offer.id} lg={4} md={6}>
                     <Card className="offer-card">
                       <div 
                         className="offer-image"
-                        style={{ backgroundImage: `url(${offer.image_url})` }}
+                        style={{ backgroundImage: `url(${getImageUrl(offer.image_url)})` }}
                       >
                         <div className="discount-badge">
                           -{offer.discount_percentage}% OFF
@@ -294,7 +293,7 @@ function AdminOffers() {
                         </div>
 
                         <ul className="offer-features">
-                          {offer.features.map((feature, index) => (
+                          {parseFeatures(offer.features).map((feature, index) => (
                             <li key={index}>
                               <Tag size={14} className="me-2" />
                               {feature}
@@ -304,17 +303,14 @@ function AdminOffers() {
 
                         <div className="d-flex justify-content-between align-items-center">
                           <div>
-                            {offer.is_active ? (
-                              <Badge bg="success">Active</Badge>
-                            ) : (
-                              <Badge bg="secondary">Inactive</Badge>
-                            )}
+                            <Badge bg="success">Active</Badge>
                           </div>
                           <div>
                             <Button
                               variant="outline-primary"
                               size="sm"
                               className="action-btn"
+                              onClick={() => navigate(`/admin/edit-offer/${offer.id}`)}
                             >
                               <Edit size={14} />
                             </Button>

@@ -23,6 +23,8 @@ import Offers from "./pages/Offers";
 import AdminAddCar from "./pages/AdminAddCar";
 import AdminManageCars from "./pages/AdminManageCars";
 import AdminOffers from "./pages/AdminOffers";
+import AdminAddOffer from "./pages/AdminAddOffer";
+import AdminEditOffer from "./pages/AdminEditOffer";
 import AdminComments from "./pages/AdminComments";
 
 import { useState, useEffect } from 'react';
@@ -79,6 +81,12 @@ function App() {
         </AdminRoute> } />
           <Route path="/admin/offers" element={<AdminRoute user={user}>
           <AdminOffers />
+        </AdminRoute> } />
+          <Route path="/admin/add-offer" element={<AdminRoute user={user}>
+          <AdminAddOffer />
+        </AdminRoute> } />
+          <Route path="/admin/edit-offer/:id" element={<AdminRoute user={user}>
+          <AdminEditOffer />
         </AdminRoute> } />
           <Route path="/admin/comments" element={<AdminRoute user={user}>
           <AdminComments />
