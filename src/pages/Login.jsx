@@ -27,10 +27,10 @@ export default function Login() {
       if (response.ok ) {
         if (data.user && data.user.role === 'admin') {
           loginAsAdmin(data);
-          navigate('/');
+          window.location.href = '/';
         } else {
           localStorage.setItem('user', JSON.stringify(data));
-          navigate('/');
+          window.location.href = '/';
         }
       } else {
         setError(data.message || 'Invalid credentials');

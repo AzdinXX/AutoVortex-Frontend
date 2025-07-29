@@ -20,6 +20,10 @@ import Dashboard from "./pages/Dashboard";
 import Saidbar from "./components/Saidbar";
 import { AdminProvider } from "./context/AdminContext";
 import Offers from "./pages/Offers";
+import AdminAddCar from "./pages/AdminAddCar";
+import AdminManageCars from "./pages/AdminManageCars";
+import AdminOffers from "./pages/AdminOffers";
+import AdminComments from "./pages/AdminComments";
 
 import { useState, useEffect } from 'react';
 
@@ -39,7 +43,7 @@ function App() {
   return (
     <AdminProvider>
       <div>
-        {user && user.role === 'admin' && <Saidbar />}
+        <Saidbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/Signup" element={<Signup />} />
@@ -53,6 +57,13 @@ function App() {
           <Route path="/comments" element={<Comments />} />
           <Route path="/about" element={<About />} />
           <Route path="/useraccount" element={<UserAccount />} />
+          <Route path="/offers" element={<Offers />} />
+          
+          {/* Admin Sidebar Routes */}
+          <Route path="/admin/add-car" element={<AdminAddCar />} />
+          <Route path="/admin/manage-cars" element={<AdminManageCars />} />
+          <Route path="/admin/offers" element={<AdminOffers />} />
+          <Route path="/admin/comments" element={<AdminComments />} />
         </Routes>
       </div>
     </AdminProvider>
