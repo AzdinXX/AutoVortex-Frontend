@@ -9,6 +9,20 @@ export default function Home() {
   const [activeKey, setActiveKey] = useState('home');
   const [user, setUser] = useState(null);
 const [notificationCount, setNotificationCount] = useState(0);
+const [testimonials, setTestimonials] = useState([]);
+
+useEffect(() => {
+  const fetchTestimonials = async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/api/comments');
+      setTestimonials(res.data);
+    } catch (error) {
+      console.error('Failed to fetch testimonials', error);
+    }
+  };
+
+  fetchTestimonials();
+}, []);
   const [notifCount, setNotifCount] = useState(0);
   const navigate = useNavigate();
 
@@ -113,29 +127,6 @@ useEffect(() => {
     }
   ];
 
-  const testimonials = [
-    {
-      id: 1,
-      name: "Ahmed Hassan",
-      rating: 5,
-      comment: "Excellent service! The car was clean and well-maintained. Will definitely rent again.",
-      date: "2 days ago"
-    },
-    {
-      id: 2,
-      name: "Sara Mohammed",
-      rating: 4,
-      comment: "Smooth rental process. The staff was very helpful and the car was perfect for our trip.",
-      date: "1 week ago"
-    },
-    {
-      id: 3,
-      name: "Khalid Abdullah",
-      rating: 5,
-      comment: "Best car rental experience I've had. Great prices and premium vehicles.",
-      date: "3 weeks ago"
-    }
-  ];
 
   return (
     <div className="home-page" style={{ position: 'relative' }}>

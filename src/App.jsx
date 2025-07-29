@@ -18,24 +18,33 @@ import AdminCars from "./pages/AdminCars";
 import AdminUsers from "./pages/AdminUsers";
 import Dashboard from "./pages/Dashboard";
 import Saidbar from "./components/Saidbar";
-
 import { AdminProvider } from "./context/AdminContext";
 import Offers from "./pages/Offers";
 
+import { useState, useEffect } from 'react';
 
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      setUser(null);
+    }
+  }, []);
 
   return (
     <AdminProvider>
       <div>
-        <Saidbar />
+        {user && user.role === 'admin' && <Saidbar />}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/Signup" element={<Signup />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/auto_options" element={<Auto_Options />} />
-          <Route path="/offers" element={<Offers />} />
           <Route path="/add-car" element={<AddCar />} />
           <Route path="/edit-car/:id" element={<EditCar />} />
           <Route path="/rent/:carId" element={<RentForm />} />
@@ -44,14 +53,6 @@ function App() {
           <Route path="/comments" element={<Comments />} />
           <Route path="/about" element={<About />} />
           <Route path="/useraccount" element={<UserAccount />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="cars" element={<AdminCars />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="comments" element={<Comments />} />
-          </Route>
-
         </Routes>
       </div>
     </AdminProvider>
