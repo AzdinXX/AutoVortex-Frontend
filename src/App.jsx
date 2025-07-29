@@ -14,35 +14,47 @@ import Comments from "./pages/Comments";
 import About from "./pages/About";
 import UserAccount from "./pages/UserAccount";
 import AdminLayout from "./pages/AdminLayout";
+import AdminCars from "./pages/AdminCars";
+import AdminUsers from "./pages/AdminUsers";
+import Dashboard from "./pages/Dashboard";
+import Saidbar from "./components/Saidbar";
+
+import { AdminProvider } from "./context/AdminContext";
+import Offers from "./pages/Offers";
 
 
 
 function App() {
 
   return (
+    <AdminProvider>
+      <div>
+        <Saidbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/Signup" element={<Signup />} />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/auto_options" element={<Auto_Options />} />
+          <Route path="/offers" element={<Offers />} />
+          <Route path="/add-car" element={<AddCar />} />
+          <Route path="/edit-car/:id" element={<EditCar />} />
+          <Route path="/rent/:carId" element={<RentForm />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/notifications-user" element={<NotificationsUser />} />
+          <Route path="/comments" element={<Comments />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/useraccount" element={<UserAccount />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="cars" element={<AdminCars />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="comments" element={<Comments />} />
+          </Route>
 
-    <div>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/Signup" element={<Signup />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/auto_options" element={<Auto_Options />} />
-        <Route path="/add-car" element={<AddCar />} />
-        <Route path="/edit-car/:id" element={<EditCar />} />
-        <Route path="/rent/:carId" element={<RentForm />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/notifications-user" element={<NotificationsUser />} />
-        <Route path="/comments" element={<Comments />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/useraccount" element={<UserAccount />} />
-        <Route path="/admin" element={
-          <RequireAdmin>
-            <AdminLayout />
-          </RequireAdmin>
-        }></Route>
-
-      </Routes>
-    </div>
+        </Routes>
+      </div>
+    </AdminProvider>
   );
 }
 

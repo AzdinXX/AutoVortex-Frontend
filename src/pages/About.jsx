@@ -51,7 +51,7 @@ export default function About() {
             </p>
           </Col>
           <Col md={5} className="d-flex align-items-center justify-content-center">
-            <Image src="https://images.unsplash.com/photo-1511918984145-48de785d4c4e?auto=format&fit=crop&w=600&q=80" rounded fluid style={{ maxHeight: 260, boxShadow: '0 4px 24px rgba(30,64,175,0.18)' }} />
+            <Image src="https://lh3.googleusercontent.com/a/ACg8ocI_WkgomOGQ-E3VNZtyrEVkpRSstgOWkxU1i0lCrbcrk9GzvOn1=s288-c-no" rounded fluid style={{ maxHeight: 260, boxShadow: '0 4px 24px rgba(30,64,175,0.18)' }} />
           </Col>
         </Row>
         <Row>

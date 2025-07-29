@@ -192,14 +192,14 @@ function UserAccount() {
       <div className="user-account-card">
         <img
           className="user-account-avatar"
-          src={preview || user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=2563eb&color=fff&size=128`}
+          src={"http://localhost:3000/uploads/"+user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=2563eb&color=fff&size=128`}
           alt="User Avatar"
         />
         <div className="user-account-username">{username}</div>
         <div className="user-account-role">{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "User"}</div>
         <div className="user-account-info">
           <div><label>Email:</label> {user.email}</div>
-          <div><label>Phone:</label> {phone || <span style={{ color: '#64748b' }}>Not set</span>}</div>
+          <div><label>Phone:</label> {user.phone || <span style={{ color: '#64748b' }}>Not set</span>}</div>
         </div>
         <button className="user-account-edit-btn" onClick={() => setShowModal(true)}>Edit Profile</button>
       </div>

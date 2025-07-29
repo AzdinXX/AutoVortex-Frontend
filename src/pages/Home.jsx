@@ -76,6 +76,7 @@ useEffect(() => {
       setNotifCount(0);
     }
   };
+  
 
   const discountedCars = [
     {

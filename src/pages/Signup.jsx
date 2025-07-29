@@ -30,33 +30,36 @@ export default function Signup() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  setSuccess('');
 
-    try {
-      const data = new FormData();
-      data.append('username', formData.username);
-      data.append('email', formData.email);
-      data.append('password', formData.password);
-      data.append('phone', formData.phone);
-      data.append('role', formData.role);
-      if (formData.image) {
-        data.append('image', formData.image);
-      }
-      const res = await axios.post('http://localhost:3000/register', data);
-      setSuccess(res.data.message);
-      if (res.data && res.data.user) {
-        localStorage.setItem('user', JSON.stringify(res.data.user));
-      }
-      navigate('/');
-    } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
-    } finally {
-      setLoading(false);
+  try {
+    const data = new FormData();
+    data.append('username', formData.username);
+    data.append('email',    formData.email);
+    data.append('password', formData.password);
+    data.append('phone',    formData.phone);
+    data.append('role',     formData.role);
+    if (formData.image) data.append('image', formData.image);
+
+    const res = await axios.post('http://localhost:3000/register', data);
+    setSuccess(res.data.message);
+
+    if (res.data.user) {
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+
+      navigate('/login'); 
+    } else {
+      navigate('/login');
     }
-  };
+  } catch (err) {
+    setError(err.response?.data?.message || 'Registration failed. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="signup-page" style={{ minHeight: '100vh', background: 'linear-gradient(120deg, #0a192f 0%, #1e293b 100%)' }}>
@@ -173,6 +176,7 @@ export default function Signup() {
                     <Button type="submit" variant="primary" className="signup-btn" disabled={loading}>
                       {loading ? 'Registering...' : 'Sign Up'}
                     </Button>
+                    
                   </div>
                 </Form>
                 <div className="text-center mt-3">

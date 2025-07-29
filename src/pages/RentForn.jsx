@@ -8,41 +8,61 @@ function RentForm() {
   const [endDate, setEndDate] = useState('');
   const [message, setMessage] = useState('');
   const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { carId } = useParams();
 
   useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user"));
-        console.log("User from localStorage:", user);
-        if (user) {
-            setUserId(user.id);
-        }
-    }, []);
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.id) {
+      setUserId(user.id);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    if (!userId ) {
-      alert("Missing userID.");
+    if (!userId) {
+      alert("Please log in to rent a car.");
+      setLoading(false);
       return;
     }
 
-    if (!carId ) {
-      alert("Missing car id.");
+    if (!carId) {
+      alert("Missing car information.");
+      setLoading(false);
+      return;
+    }
+
+    if (!startDate || !endDate) {
+      alert("Please select start and end dates.");
+      setLoading(false);
       return;
     }
 
     try {
-      await axios.post('http://localhost:3000/api/rentals', {
-        user_id: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).id : null,
+      const response = await axios.post('http://localhost:3000/api/rentals', {
+        user_id: userId,
         car_id: carId,
         start_date: startDate,
         end_date: endDate,
-        message,
+        message: message || '',
       });
-      alert('You sent the request successfully!');
+      
+      alert('Rental request sent successfully!');
+      // Reset form
+      setStartDate('');
+      setEndDate('');
+      setMessage('');
     } catch (err) {
-      console.error(err);
-      alert('Error sending the request');
+      console.error('Rental request error:', err);
+      if (err.response?.status === 401) {
+        alert('Please log in to rent a car.');
+      } else {
+        alert('Error sending the request. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,8 +152,8 @@ function RentForm() {
                 />
               </Form.Group>
 
-              <Button type="submit" variant="primary" className="rent-btn w-100">
-                Send Request
+              <Button type="submit" variant="primary" className="rent-btn w-100" disabled={loading}>
+                {loading ? 'Sending Request...' : 'Send Request'}
               </Button>
             </Form>
           </Card.Body>

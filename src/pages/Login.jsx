@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAdmin } from '../context/AdminContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { loginAsAdmin } = useAdmin();
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -22,9 +24,14 @@ export default function Login() {
         body: JSON.stringify({ email, password })
       });
       const data = await response.json();
-      if (response.ok && data.success) {
-        localStorage.setItem('user', JSON.stringify(data));
-        navigate('/');
+      if (response.ok ) {
+        if (data.user && data.user.role === 'admin') {
+          loginAsAdmin(data);
+          navigate('/');
+        } else {
+          localStorage.setItem('user', JSON.stringify(data));
+          navigate('/');
+        }
       } else {
         setError(data.message || 'Invalid credentials');
       }

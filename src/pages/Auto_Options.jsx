@@ -255,8 +255,6 @@ function Auto_Options() {
           background: #fff;
         }
       `}</style>
-
-      {/* Navbar */}
       <Navbar expand="lg" fixed="top" className="py-3 custom-navbar">
         <Container>
           <Navbar.Brand as={Link} to="/" className="fw-bold">AutoVortex</Navbar.Brand>
@@ -273,18 +271,16 @@ function Auto_Options() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
-      {/* Main Content */}
       <div style={{ paddingTop: '90px', minHeight: '80vh' }}>
         <div className="cars-grid">
           {cars.map((car) => (
             <div key={car.id} className="car-card">
               <div className="car-image-container">
                 <img
-                  src={car.image}
+                  src={car.image ? `http://localhost:3000/uploads/${car.image}` : 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&h=300&fit=crop'}
                   alt={`${car.brand} ${car.model}`}
                   className="car-image"
-                  onError={(e) => e.target.src = 'placeholder-image-url'}
+                  onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&h=300&fit=crop'}
                 />
                 <div className="car-badge">{car.type}</div>
               </div>
@@ -341,7 +337,6 @@ function Auto_Options() {
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="py-4 custom-footer">
         <Container>
           <Row>
