@@ -20,7 +20,7 @@ useEffect(() => {
 
 const fetchLatestOffers = async () => {
   try {
-    const response = await axios.get('http://localhost:3000/offers');
+          const response = await axios.get('http://localhost:3000/api/offers');
     const sortedOffers = response.data.sort((a, b) => b.id - a.id); 
     const latestThree = sortedOffers.slice(0, 3);
     setOffers(latestThree);
@@ -176,159 +176,591 @@ useEffect(() => {
   return (
     <div className="home-page" style={{ position: 'relative' }}>
       <style>{`
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+  
   .home-page {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(120deg, #0a192f 0%, #1e293b 100%);
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0a192f 0%, #1e293b 50%, #0f172a 100%);
     min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background particles */
+  .home-page::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba(59,130,246,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(147,51,234,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(236,72,153,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
   }
 
   .navbar {
-    transition: background-color 0.3s ease;
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: rgba(10, 25, 47, 0.8);
+    z-index: 1000;
   }
 
   .navbar.scrolled {
-    background-color: rgba(10, 25, 47, 0.95) !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: rgba(10, 25, 47, 0.95) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(59,130,246,0.2);
+  }
+
+  .navbar-brand {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    font-size: 2rem !important;
+    text-shadow: 0 2px 20px rgba(37,99,235,0.3);
+  }
+
+  .nav-link {
+    position: relative;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
   }
 
   .hero-section {
     position: relative;
     overflow: hidden;
+    min-height: 100vh;
   }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      linear-gradient(135deg, rgba(10, 25, 47, 0.9), rgba(30, 41, 59, 0.8)),
+      url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    z-index: -1;
+  }
+
   .hero-section::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 70% 30%, rgba(59,130,246,0.15) 0%, transparent 70%);
+    background: 
+      radial-gradient(circle at 30% 20%, rgba(59,130,246,0.2) 0%, transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(147,51,234,0.15) 0%, transparent 50%);
     z-index: 0;
+    animation: pulse 4s ease-in-out infinite;
   }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+  }
+
   .hero-section .container {
     position: relative;
     z-index: 1;
   }
-  .hero-section h1, .hero-section p {
-    text-shadow: 0 2px 16px rgba(0,0,0,0.3);
-  }
-  .btn-primary, .btn-outline-light {
-    font-size: 1.1rem;
-    border-radius: 30px;
-    box-shadow: 0 2px 8px rgba(59,130,246,0.12);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-primary:hover, .btn-outline-light:hover {
-    transform: translateY(-2px) scale(1.04);
-    box-shadow: 0 6px 24px rgba(59,130,246,0.18);
+
+  .hero-section h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff, #e0e7ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 30px rgba(255,255,255,0.3);
+    animation: slideInUp 1s ease-out;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+    word-wrap: break-word;
+    hyphens: auto;
   }
 
-  .discount-card {
-    transition: transform 0.3s ease, box-shadow 0.3s;
-    background: linear-gradient(135deg, #1e293b 60%, #2563eb 100%);
-    border-radius: 18px;
+  .hero-section p {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 400;
+    color: #cbd5e1;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    animation: slideInUp 1s ease-out 0.2s both;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    padding: 0 1rem;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .btn-primary, .btn-outline-light {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: 600;
+    border-radius: 50px;
+    padding: clamp(12px, 2.5vw, 15px) clamp(25px, 4vw, 40px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
     overflow: hidden;
-    color: white;
-    box-shadow: 0 4px 24px rgba(30,64,175,0.08);
-  }
-  .discount-card:hover {
-    transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 12px 32px rgba(30,64,175,0.18);
-  }
-  .discount-badge {
-    z-index: 1;
-    border-bottom-right-radius: 12px;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    box-shadow: 0 2px 8px rgba(220,38,38,0.12);
-  }
-  .car-image-placeholder {
-    height: 180px;
-    background: linear-gradient(45deg, #1e3a8a 60%, #0c4a6e 100%);
-    display: flex;
+    min-height: 48px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-weight: bold;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border: none;
+    box-shadow: 0 8px 25px rgba(37,99,235,0.3);
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+
+  .btn-primary:hover, .btn-outline-light:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(37,99,235,0.4);
+  }
+
+  .btn-outline-light {
+    border: 2px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-outline-light:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: #ffffff;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-buttons {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .hero-buttons .btn {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-section h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .hero-section p {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 0 0.5rem;
+    }
+    
+    .hero-buttons {
+      margin-top: 1.5rem;
+    }
+    
+    .btn-primary, .btn-outline-light {
+      font-size: 0.9rem;
+      padding: 12px 20px;
+      min-height: 44px;
+    }
+  }
+
+  .offer-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .offer-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 25px 60px rgba(37,99,235,0.2);
+  }
+
+  .offer-image {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .offer-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(37,99,235,0.3), rgba(124,58,237,0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+
+  .offer-card:hover .offer-image::before {
+    opacity: 1;
+  }
+
+  .discount-badge {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+    font-weight: 700;
+    padding: 10px 25px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(220,38,38,0.3);
+    z-index: 2;
+    animation: slideInLeft 0.6s ease-out;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .car-type-badge {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(37,99,235,0.2);
+  }
+
+  .price-section {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border-radius: 15px;
+    padding: 15px 20px;
+    border: 1px solid rgba(37,99,235,0.1);
+  }
+
+  .original-price {
+    color: #64748b;
+    font-weight: 500;
+    text-decoration: line-through;
+  }
+
+  .discounted-price {
+    color: #2563eb;
+    font-weight: 700;
     font-size: 1.3rem;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .rent-btn {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    padding: 15px 0;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rent-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .rent-btn:hover::before {
+    left: 100%;
+  }
+
+  .rent-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(37,99,235,0.3);
   }
 
   .testimonial-carousel .carousel-control-prev,
   .testimonial-carousel .carousel-control-next {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    background-color: rgba(30, 64, 175, 0.7);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 15px rgba(37,99,235,0.3);
     top: 50%;
     transform: translateY(-50%);
-    border: 2px solid #fff;
-    box-shadow: 0 2px 8px rgba(30,64,175,0.12);
-  }
-  .testimonial-carousel .carousel-control-prev {
-    left: -50px;
-  }
-  .testimonial-carousel .carousel-control-next {
-    right: -50px;
-  }
-  .testimonial-carousel .card {
-    border-radius: 18px;
-    background: linear-gradient(120deg, #1e293b 80%, #2563eb 100%);
-    color: #fff;
-    box-shadow: 0 4px 24px rgba(30,64,175,0.08);
+    transition: all 0.3s ease;
   }
 
-  .icon-circle {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: rgba(30, 64, 175, 0.18);
-    border: 2px solid rgba(59, 130, 246, 0.5);
-    box-shadow: 0 2px 8px rgba(59,130,246,0.12);
-    transition: background 0.3s;
+  .testimonial-carousel .carousel-control-prev:hover,
+  .testimonial-carousel .carousel-control-next:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 25px rgba(37,99,235,0.4);
   }
-  .icon-circle:hover {
-    background: rgba(59,130,246,0.28);
+
+  .testimonial-carousel .carousel-control-prev {
+    left: -60px;
+  }
+
+  .testimonial-carousel .carousel-control-next {
+    right: -60px;
+  }
+
+  .testimonial-card {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    border-radius: 25px;
+    color: white;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+  }
+
+  .feature-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 30px rgba(37,99,235,0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+
+  .feature-icon:hover::before {
+    transform: translateX(100%);
+  }
+
+  .feature-icon:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(37,99,235,0.4);
+  }
+
+  .feature-icon i {
+    font-size: 2.5rem;
+    color: white;
+  }
+
+  .feature-text {
+    background: rgba(37,99,235,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(37,99,235,0.2);
+    backdrop-filter: blur(10px);
   }
 
   footer {
-    background: rgba(10, 25, 47, 0.92);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 -2px 16px rgba(30,64,175,0.08);
+    background: linear-gradient(135deg, rgba(10, 25, 47, 0.95), rgba(30, 41, 59, 0.9));
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(59,130,246,0.2);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
   }
+
   footer h5 {
+    color: #2563eb;
+    font-weight: 700;
     letter-spacing: 1px;
-    font-weight: 600;
+    margin-bottom: 20px;
   }
-  footer ul li a:hover {
-    color: #2563eb !important;
-    text-decoration: underline;
+
+  footer ul li {
+    margin-bottom: 10px;
   }
-  footer ul li i {
+
+  footer ul li a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  footer ul li a::before {
+    content: '→';
+    position: absolute;
+    left: -20px;
+    opacity: 0;
+    transition: all 0.3s ease;
     color: #2563eb;
   }
-  footer p {
-    font-size: 1rem;
-    letter-spacing: 0.5px;
+
+  footer ul li a:hover {
+    color: #2563eb;
+    padding-left: 20px;
   }
+
+  footer ul li a:hover::before {
+    opacity: 1;
+  }
+
+  footer ul li i {
+    color: #2563eb;
+    margin-right: 10px;
+  }
+
   .nav-bell {
     position: relative;
     font-size: 1.7rem;
     color: #fff;
     margin-right: 18px;
     cursor: pointer;
+    transition: all 0.3s ease;
   }
+
+  .nav-bell:hover {
+    transform: scale(1.1);
+    color: #2563eb;
+  }
+
   .nav-bell .notif-count {
     position: absolute;
-    top: -6px;
-    right: -10px;
-    background: #dc2626;
+    top: -8px;
+    right: -12px;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
     color: #fff;
     border-radius: 50%;
-    font-size: 0.85rem;
-    padding: 2px 7px;
+    font-size: 0.8rem;
+    padding: 4px 8px;
     font-weight: bold;
-    box-shadow: 0 2px 8px rgba(220,38,38,0.18);
+    box-shadow: 0 4px 15px rgba(220,38,38,0.4);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
+  /* Scroll animations */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Floating animation for cards */
+  .floating {
+    animation: floating 3s ease-in-out infinite;
+  }
+
+  @keyframes floating {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Glow effect for important elements */
+  .glow {
+    box-shadow: 0 0 20px rgba(37,99,235,0.3);
+  }
+
+  .glow:hover {
+    box-shadow: 0 0 30px rgba(37,99,235,0.5);
   }
 `}</style>
       <Navbar bg="transparent" expand="lg" fixed="top" className="py-3">
@@ -408,33 +840,113 @@ useEffect(() => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <section className="hero-section" style={{
-        backgroundImage: `linear-gradient(rgba(0, 15, 40, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        color: 'white'
-      }}>
+      <section className="hero-section">
         <Container className="text-center">
-          <h1 className="display-2 fw-bold mb-4">Rent the Best Cars</h1>
-          <p className="lead fs-4 mb-5">Premium vehicles at affordable prices with exclusive discounts</p>
-          <div className="mt-4">
-            <Button as={Link} to="/auto_options" variant="primary" size="lg" className="me-3 px-5 py-3">
-              Browse Cars
-            </Button>
-            <Button as={Link} to="/offers" variant="outline-light" size="lg" className="px-5 py-3">
-              View Offers
-            </Button>
+          <div className="hero-content">
+            <h1 className="hero-title mb-4">Rent the Best Cars</h1>
+            <p className="hero-subtitle mb-5">Premium vehicles at affordable prices with exclusive discounts</p>
+            <div className="hero-buttons">
+              <Button as={Link} to="/auto_options" variant="primary" size="lg" className="glow">
+                <i className="bi bi-car-front" aria-hidden="true"></i>
+                <span>Browse Cars</span>
+              </Button>
+              <Button as={Link} to="/offers" variant="outline-light" size="lg">
+                <i className="bi bi-tag" aria-hidden="true"></i>
+                <span>View Offers</span>
+              </Button>
+            </div>
+          </div>
+          
+          {/* Floating decorative elements */}
+          <div className="floating-elements">
+            <div className="floating-card" style={{
+              position: 'absolute',
+              top: '20%',
+              left: '10%',
+              width: '60px',
+              height: '60px',
+              background: 'linear-gradient(135deg, rgba(37,99,235,0.2), rgba(124,58,237,0.2))',
+              borderRadius: '50%',
+              animation: 'floating 4s ease-in-out infinite',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}></div>
+            <div className="floating-card" style={{
+              position: 'absolute',
+              top: '60%',
+              right: '15%',
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, rgba(236,72,153,0.2), rgba(147,51,234,0.2))',
+              borderRadius: '50%',
+              animation: 'floating 3s ease-in-out infinite reverse',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}></div>
+            <div className="floating-card" style={{
+              position: 'absolute',
+              bottom: '30%',
+              left: '20%',
+              width: '80px',
+              height: '80px',
+              background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(16,185,129,0.1))',
+              borderRadius: '20px',
+              animation: 'floating 5s ease-in-out infinite',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}></div>
           </div>
         </Container>
       </section>
-      <section className="py-5" style={{ background: 'linear-gradient(120deg, #1e293b 60%, #2563eb 100%)' }}>
+      <section className="py-5 offers-section" style={{ 
+        background: 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #2563eb 100%)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background decorative elements */}
+        <div className="section-bg-elements">
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            right: '5%',
+            width: '200px',
+            height: '200px',
+            background: 'radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%)',
+            borderRadius: '50%',
+            animation: 'pulse 4s ease-in-out infinite'
+          }}></div>
+          <div style={{
+            position: 'absolute',
+            bottom: '20%',
+            left: '10%',
+            width: '150px',
+            height: '150px',
+            background: 'radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%)',
+            borderRadius: '50%',
+            animation: 'pulse 3s ease-in-out infinite reverse'
+          }}></div>
+        </div>
+        
         <Container className="my-5">
-          <h2 className="mb-4 text-center fw-bold" style={{ color: '#fff', letterSpacing: '2px', textShadow: '0 2px 12px rgba(30,64,175,0.25)' }}>
-            Latest Special Offers
-          </h2>
+          <div className="text-center mb-5">
+            <h2 className="section-title fw-bold" style={{ 
+              color: '#fff', 
+              letterSpacing: '3px', 
+              textShadow: '0 4px 20px rgba(37,99,235,0.3)',
+              fontSize: '3rem',
+              marginBottom: '1rem'
+            }}>
+              Latest Special Offers
+            </h2>
+            <div className="title-underline" style={{
+              width: '100px',
+              height: '4px',
+              background: 'linear-gradient(90deg, #2563eb, #7c3aed)',
+              margin: '0 auto',
+              borderRadius: '2px',
+              boxShadow: '0 2px 10px rgba(37,99,235,0.3)'
+            }}></div>
+          </div>
           <Row className="g-4">
             {offers.map((offer) => (
               <Col key={offer.id} lg={4} md={6}>
@@ -555,9 +1067,45 @@ useEffect(() => {
           </Row>
         </Container>
       </section>
-      <section className="py-5" style={{ backgroundColor: '#0f172a' }}>
+      <section className="py-5 testimonials-section" style={{ 
+        backgroundColor: '#0f172a',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background pattern */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
+            radial-gradient(circle at 25% 25%, rgba(37,99,235,0.05) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(124,58,237,0.05) 0%, transparent 50%)
+          `,
+          pointerEvents: 'none'
+        }}></div>
+        
         <Container className="py-5">
-          <h2 className="text-center text-white mb-5">Customer Reviews</h2>
+          <div className="text-center mb-5">
+            <h2 className="section-title fw-bold" style={{ 
+              color: '#fff', 
+              letterSpacing: '3px', 
+              textShadow: '0 4px 20px rgba(37,99,235,0.3)',
+              fontSize: '3rem',
+              marginBottom: '1rem'
+            }}>
+              Customer Reviews
+            </h2>
+            <div className="title-underline" style={{
+              width: '100px',
+              height: '4px',
+              background: 'linear-gradient(90deg, #2563eb, #7c3aed)',
+              margin: '0 auto',
+              borderRadius: '2px',
+              boxShadow: '0 2px 10px rgba(37,99,235,0.3)'
+            }}></div>
+          </div>
           <Row className="justify-content-center">
             <Col md={8}>
               <Carousel indicators={false} className="testimonial-carousel">
@@ -584,89 +1132,119 @@ useEffect(() => {
           </Row>
         </Container>
       </section>
-      <section className="py-5" style={{ backgroundColor: '#0a192f' }}>
+      <section className="py-5 features-section" style={{ 
+        backgroundColor: '#0a192f',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Animated background elements */}
+        <div className="features-bg">
+          <div style={{
+            position: 'absolute',
+            top: '15%',
+            left: '5%',
+            width: '300px',
+            height: '300px',
+            background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)',
+            borderRadius: '50%',
+            animation: 'float 6s ease-in-out infinite'
+          }}></div>
+          <div style={{
+            position: 'absolute',
+            bottom: '10%',
+            right: '10%',
+            width: '250px',
+            height: '250px',
+            background: 'radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)',
+            borderRadius: '50%',
+            animation: 'float 8s ease-in-out infinite reverse'
+          }}></div>
+        </div>
+        
         <Container className="py-5">
-          <h2 className="text-center text-white mb-5" style={{
-            letterSpacing: '2px',
-            fontWeight: 700,
-            textShadow: '0 2px 12px rgba(37,99,235,0.18)'
-          }}>
-            Why Choose Us?
-          </h2>
+          <div className="text-center mb-5">
+            <h2 className="section-title fw-bold" style={{
+              color: '#fff',
+              letterSpacing: '3px',
+              textShadow: '0 4px 20px rgba(37,99,235,0.3)',
+              fontSize: '3rem',
+              marginBottom: '1rem'
+            }}>
+              Why Choose Us?
+            </h2>
+            <div className="title-underline" style={{
+              width: '100px',
+              height: '4px',
+              background: 'linear-gradient(90deg, #2563eb, #7c3aed)',
+              margin: '0 auto',
+              borderRadius: '2px',
+              boxShadow: '0 2px 10px rgba(37,99,235,0.3)'
+            }}></div>
+          </div>
           <Row>
-            <Col md={4} className="text-center mb-4">
-              <div
-                className="icon-circle mb-3 mx-auto d-flex align-items-center justify-content-center"
-                style={{
-                  background: 'linear-gradient(135deg, #2563eb 60%, #1e293b 100%)',
-                  boxShadow: '0 4px 24px rgba(37,99,235,0.13)',
-                  width: 90,
-                  height: 90
-                }}
-              >
-                <i className="bi bi-car-front fs-1 text-white"></i>
+                        <Col md={4} className="text-center mb-4">
+              <div className="feature-icon">
+                <i className="bi bi-car-front"></i>
               </div>
-              <h3 className="text-white fw-bold" style={{ fontSize: '1.5rem', letterSpacing: '1px' }}>Wide Selection</h3>
-              <p className="text-light" style={{
-                background: 'rgba(37,99,235,0.08)',
-                borderRadius: '12px',
-                padding: '12px 18px',
-                marginTop: '10px'
-              }}>
-                Choose from our diverse fleet of vehicles to suit your needs.
-              </p>
+              <h3 className="text-white fw-bold" style={{ fontSize: '1.8rem', letterSpacing: '1px', marginBottom: '1rem' }}>
+                Wide Selection
+              </h3>
+              <div className="feature-text">
+                <p className="text-light mb-0">
+                  Choose from our diverse fleet of vehicles to suit your needs.
+                </p>
+              </div>
             </Col>
             <Col md={4} className="text-center mb-4">
-              <div
-                className="icon-circle mb-3 mx-auto d-flex align-items-center justify-content-center"
-                style={{
-                  background: 'linear-gradient(135deg, #1e293b 60%, #2563eb 100%)',
-                  boxShadow: '0 4px 24px rgba(37,99,235,0.13)',
-                  width: 90,
-                  height: 90
-                }}
-              >
-                <i className="bi bi-currency-dollar fs-1 text-white"></i>
+              <div className="feature-icon">
+                <i className="bi bi-currency-dollar"></i>
               </div>
-              <h3 className="text-white fw-bold" style={{ fontSize: '1.5rem', letterSpacing: '1px' }}>Affordable Prices</h3>
-              <p className="text-light" style={{
-                background: 'rgba(37,99,235,0.08)',
-                borderRadius: '12px',
-                padding: '12px 18px',
-                marginTop: '10px'
-              }}>
-                Competitive rates with no hidden fees.
-              </p>
+              <h3 className="text-white fw-bold" style={{ fontSize: '1.8rem', letterSpacing: '1px', marginBottom: '1rem' }}>
+                Affordable Prices
+              </h3>
+              <div className="feature-text">
+                <p className="text-light mb-0">
+                  Competitive rates with no hidden fees.
+                </p>
+              </div>
             </Col>
             <Col md={4} className="text-center mb-4">
-              <div
-                className="icon-circle mb-3 mx-auto d-flex align-items-center justify-content-center"
-                style={{
-                  background: 'linear-gradient(135deg, #2563eb 60%, #1e293b 100%)',
-                  boxShadow: '0 4px 24px rgba(37,99,235,0.13)',
-                  width: 90,
-                  height: 90
-                }}
-              >
-                <i className="bi bi-calendar-check fs-1 text-white"></i>
+              <div className="feature-icon">
+                <i className="bi bi-calendar-check"></i>
               </div>
-              <h3 className="text-white fw-bold" style={{ fontSize: '1.5rem', letterSpacing: '1px' }}>Easy Booking</h3>
-              <p className="text-light" style={{
-                background: 'rgba(37,99,235,0.08)',
-                borderRadius: '12px',
-                padding: '12px 18px',
-                marginTop: '10px'
-              }}>
-                Simple online reservation system.
-              </p>
+              <h3 className="text-white fw-bold" style={{ fontSize: '1.8rem', letterSpacing: '1px', marginBottom: '1rem' }}>
+                Easy Booking
+              </h3>
+              <div className="feature-text">
+                <p className="text-light mb-0">
+                  Simple online reservation system.
+                </p>
+              </div>
             </Col>
           </Row>
         </Container>
       </section>
-      <footer className="py-4" style={{
-        backgroundColor: 'rgba(10, 25, 47, 0.85)',
-        backdropFilter: 'blur(10px)'
+      <footer className="py-5" style={{
+        background: 'linear-gradient(135deg, rgba(10, 25, 47, 0.95), rgba(30, 41, 59, 0.9))',
+        backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(59,130,246,0.2)',
+        boxShadow: '0 -10px 30px rgba(0,0,0,0.3)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
+        {/* Footer background pattern */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `
+            radial-gradient(circle at 20% 80%, rgba(37,99,235,0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(124,58,237,0.05) 0%, transparent 50%)
+          `,
+          pointerEvents: 'none'
+        }}></div>
         <Container>
           <Row>
             <Col md={4} className="mb-4 mb-md-0">

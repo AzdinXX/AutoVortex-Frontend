@@ -50,7 +50,6 @@ function RentForm() {
       });
       
       alert('Rental request sent successfully!');
-      // Reset form
       setStartDate('');
       setEndDate('');
       setMessage('');

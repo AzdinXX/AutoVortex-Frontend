@@ -3,13 +3,15 @@ import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
 
 function Notifications() {
-    const [notifications, setNotifications] = useState([]);
-    const [notifCount, setNotifCount] = useState(0);
-    const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [notifCount, setNotifCount] = useState(0);
+  const [replyText, setReplyText] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null);
+  const navigate = useNavigate();
     
-    const handleDelete = async (id) => {
+    const handleDelete = async (id, type) => {
      try {
-       await axios.delete(`http://localhost:3000/api/notifications/${id}`);
+       await axios.delete(`http://localhost:3000/api/notifications/${type}/${id}`);
        fetchNotifications();
        fetchNotifCount();
      } catch (err) {
@@ -45,16 +47,46 @@ function Notifications() {
         }
     };
 
-    const handleAccept = (id) => {
-        axios.put(`http://localhost:3000/api/notifications/accept/${id}`)
+    const handleAccept = (id, type) => {
+        axios.put(`http://localhost:3000/api/notifications/accept/${type}/${id}`)
             .then(res => { fetchNotifications(); fetchNotifCount(); })
             .catch(err => { console.error(err) });
     };
 
-    const handleReject = (id) => {
-        axios.put(`http://localhost:3000/api/notifications/reject/${id}`)
+    const handleReject = (id, type) => {
+        axios.put(`http://localhost:3000/api/notifications/reject/${type}/${id}`)
             .then(res => { fetchNotifications(); fetchNotifCount(); })
             .catch(err => { console.error(err) });
+    };
+
+    const handleReply = async (id, type) => {
+        if (!replyText.trim()) {
+            alert('Please enter a reply message');
+            return;
+        }
+        
+        try {
+            await axios.post(`http://localhost:3000/api/notifications/reply/${type}/${id}`, {
+                admin_reply: replyText
+            });
+            setReplyText('');
+            setReplyingTo(null);
+            fetchNotifications();
+            fetchNotifCount();
+        } catch (err) {
+            console.error('Failed to send reply:', err);
+            alert('Failed to send reply');
+        }
+    };
+
+    const startReply = (id) => {
+        setReplyingTo(id);
+        setReplyText('');
+    };
+
+    const cancelReply = () => {
+        setReplyingTo(null);
+        setReplyText('');
     };
 
     return (
@@ -98,11 +130,11 @@ function Notifications() {
                     background: #facc15;
                     color: #1e293b;
                 }
-                .notif-status.accepted {
+                .notif-status.accepted, .notif-status.approved {
                     background: #22c55e;
                     color: #fff;
                 }
-                .notif-status.rejected {
+                .notif-status.rejected, .notif-status.cancelled {
                     background: #dc2626;
                     color: #fff;
                 }
@@ -119,6 +151,12 @@ function Notifications() {
                 .notif-action-btn.btn-danger:hover {
                     background: #991b1b;
                 }
+                .badge.bg-warning {
+                    color: #1e293b !important;
+                }
+                .badge.bg-info {
+                    color: #fff !important;
+                }
             `}</style>
             <nav className="notif-header d-flex align-items-center justify-content-between px-4 py-3 mb-5 shadow-lg" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                 <span className="fw-bold fs-3">Admin Notifications</span>
@@ -130,7 +168,7 @@ function Notifications() {
                 </NavLink>
             </nav>
             <div className="container py-4">
-                <h2 className="text-white fw-bold mb-4 text-center" style={{ letterSpacing: '1px' }}>Rental Requests</h2>
+                <h2 className="text-white fw-bold mb-4 text-center" style={{ letterSpacing: '1px' }}>All Requests</h2>
                 <div className="row justify-content-center">
                 {notifications.length === 0 && (
                     <div className="col-12 text-center text-light fs-5 py-5">No notifications to display.</div>
@@ -152,20 +190,68 @@ function Notifications() {
                             </div>
                             <div className="text-light mb-2"><strong>User:</strong> {n.user_name}</div>
                             <div className="text-light mb-2"><strong>Phone:</strong> {n.user_phone || "Not provided"}</div>
-                            <div className="text-light mb-2"><strong>Car:</strong> {n.car_name}</div>
-                            <div className="text-light mb-2"><strong>Message:</strong> {n.message}</div>
+                            <div className="text-light mb-2">
+                                <strong>Type:</strong> 
+                                <span className={`badge ${n.request_type === 'offer_request' ? 'bg-warning' : 'bg-info'} ms-2`}>
+                                    {n.request_type === 'offer_request' ? 'Offer Request' : 'Car Rental'}
+                                </span>
+                            </div>
+                            <div className="text-light mb-2"><strong>Car/Offer:</strong> {n.car_name}</div>
+                            <div className="text-light mb-2"><strong>Message:</strong> {n.message || 'No message'}</div>
                             <div className="text-light mb-2"><strong>Start Date:</strong> {new Date(n.start_date).toLocaleDateString('en-GB')}</div>
                             <div className="text-light mb-2"><strong>End Date:</strong> {new Date(n.end_date).toLocaleDateString('en-GB')}</div>
                             {n.status === "pending" && (
                                 <div className="d-flex gap-3 mt-4">
-                                    <button className="btn btn-dark notif-action-btn" onClick={() => handleAccept(n.id)}>Accept</button>
-                                    <button className="btn btn-danger notif-action-btn" onClick={() => handleReject(n.id)}>Reject</button>
-                                    <button className="btn btn-outline-danger notif-action-btn" onClick={() => handleDelete(n.id)}>Delete</button>
+                                    <button className="btn btn-dark notif-action-btn" onClick={() => handleAccept(n.id, n.request_type === 'offer_request' ? 'offer' : 'car')}>Accept</button>
+                                    <button className="btn btn-danger notif-action-btn" onClick={() => handleReject(n.id, n.request_type === 'offer_request' ? 'offer' : 'car')}>Reject</button>
+                                    <button className="btn btn-outline-primary notif-action-btn" onClick={() => startReply(n.id)}>Reply</button>
+                                    <button className="btn btn-outline-danger notif-action-btn" onClick={() => handleDelete(n.id, n.request_type === 'offer_request' ? 'offer' : 'car')}>Delete</button>
                                 </div>
                             )}
                             {n.status !== "pending" && (
                                 <div className="d-flex gap-3 mt-4">
-                                    <button className="btn btn-outline-danger notif-action-btn" onClick={() => handleDelete(n.id)}>Delete</button>
+                                    <button className="btn btn-outline-primary notif-action-btn" onClick={() => startReply(n.id)}>Reply</button>
+                                    <button className="btn btn-outline-danger notif-action-btn" onClick={() => handleDelete(n.id, n.request_type === 'offer_request' ? 'offer' : 'car')}>Delete</button>
+                                </div>
+                            )}
+                            
+                            {/* Reply Section */}
+                            {replyingTo === n.id && (
+                                <div className="mt-3 p-3 bg-light rounded">
+                                    <textarea 
+                                        className="form-control mb-2" 
+                                        rows="3" 
+                                        placeholder="Enter your reply to the user..."
+                                        value={replyText}
+                                        onChange={(e) => setReplyText(e.target.value)}
+                                    />
+                                    <div className="d-flex gap-2">
+                                        <button 
+                                            className="btn btn-primary btn-sm" 
+                                            onClick={() => handleReply(n.id, n.request_type === 'offer_request' ? 'offer' : 'car')}
+                                        >
+                                            Send Reply
+                                        </button>
+                                        <button 
+                                            className="btn btn-secondary btn-sm" 
+                                            onClick={cancelReply}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Show existing admin reply */}
+                            {n.admin_reply && (
+                                <div className="mt-3 p-3 bg-info bg-opacity-10 rounded border-start border-info border-4">
+                                    <div className="fw-bold text-info mb-1">Admin Reply:</div>
+                                    <div className="text-light">{n.admin_reply}</div>
+                                    {n.admin_reply_date && (
+                                        <small className="text-light">
+                                            {new Date(n.admin_reply_date).toLocaleString()}
+                                        </small>
+                                    )}
                                 </div>
                             )}
                         </div>

@@ -7,6 +7,8 @@ export default function AdminSidebar() {
     { path: "/admin", label: "لوحة التحكم", icon: "📊" },
     { path: "/admin/cars", label: "إدارة السيارات", icon: "🚗" },
     { path: "/admin/add-car", label: "إضافة سيارة", icon: "➕" },
+    { path: "/admin/offers", label: "العروض", icon: "🎯" },
+    { path: "/admin/offer-requests", label: "طلبات العروض", icon: "📋" },
     { path: "/admin/notifications", label: "الطلبات", icon: "🔔" },
   ];
 

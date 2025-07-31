@@ -93,10 +93,10 @@ function UserNotifications() {
               if (notif.status === "pending") {
                 statusText = "Waiting for approval";
                 statusClass = "status-pending";
-              } else if (notif.status === "confirmed") {
+              } else if (notif.status === "confirmed" || notif.status === "approved") {
                 statusText = "Request approved";
                 statusClass = "status-confirmed";
-              } else if (notif.status === "cancelled") {
+              } else if (notif.status === "cancelled" || notif.status === "rejected") {
                 statusText = "Request rejected";
                 statusClass = "status-cancelled";
               } else {
@@ -110,15 +110,44 @@ function UserNotifications() {
                 : "No end date";
 
               return (
-                <div key={notif._id || Math.random()} className="col-md-7 mb-4">
+                <div key={notif.id || Math.random()} className="col-md-7 mb-4">
                   <div className="user-notif-glass-card p-4 shadow-lg">
                     <div className={`user-notif-status ${statusClass} mb-3`}>{statusText}</div>
+                    
+                    {/* Request Type Badge */}
+                    <div className="mb-3">
+                      <span className={`badge ${notif.request_type === 'offer_request' ? 'bg-warning' : 'bg-info'} me-2`}>
+                        {notif.request_type === 'offer_request' ? 'Offer Request' : 'Car Rental'}
+                      </span>
+                    </div>
+                    
                     <div className="user-notif-dates mb-2">
                       <span className="fw-bold">From: </span>
                       <span className="me-3">{startDate}</span>
                       <span className="fw-bold">To: </span>
                       <span>{endDate}</span>
                     </div>
+                    
+                    {/* User's Message */}
+                    {notif.message && (
+                      <div className="mb-3 p-3 bg-light rounded">
+                        <div className="fw-bold text-dark mb-1">Your Message:</div>
+                        <div className="text-dark">{notif.message}</div>
+                      </div>
+                    )}
+                    
+                    {/* Admin Reply */}
+                    {notif.admin_reply && (
+                      <div className="mt-3 p-3 bg-primary bg-opacity-10 rounded border-start border-primary border-4">
+                        <div className="fw-bold text-primary mb-1">Admin Reply:</div>
+                        <div className="text-light">{notif.admin_reply}</div>
+                        {notif.admin_reply_date && (
+                          <small className="text-light  d-block mt-1">
+                            {new Date(notif.admin_reply_date).toLocaleString()}
+                          </small>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               );

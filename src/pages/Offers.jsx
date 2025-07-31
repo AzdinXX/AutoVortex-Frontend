@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Badge, Button, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Clock, Star, Tag, Calendar, MapPin, Plus } from 'lucide-react';
 import axios from 'axios';
 
@@ -9,6 +9,7 @@ function Offers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOffers();
@@ -19,7 +20,7 @@ function Offers() {
       setLoading(true);
       setError('');
       
-      const response = await axios.get('http://localhost:3000/offers');
+      const response = await axios.get('http://localhost:3000/api/offers');
       setOffers(response.data);
     } catch (err) {
       setError('Failed to fetch offers');
@@ -31,10 +32,13 @@ function Offers() {
 
   const handleRentNow = (offer) => {
     if (!user) {
-      alert("Please log in to rent a car.");
+      alert("Please log in to rent an offer.");
+      navigate('/login');
       return;
     }
-    alert(`Redirecting to rent ${offer.car_type} car with ${offer.discount_percentage}% discount!`);
+    
+    // Navigate to the offer rent form
+    navigate(`/offer-rent/${offer.id}`);
   };
 
   const formatDate = (dateString) => {
@@ -83,115 +87,320 @@ function Offers() {
   return (
     <>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        
         .offers-page {
+          font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           min-height: 100vh;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #0a192f 0%, #1e293b 50%, #0f172a 100%);
           padding: 2rem 0;
+          position: relative;
+          overflow-x: hidden;
         }
+
+        /* Animated background particles */
+        .offers-page::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: 
+            radial-gradient(circle at 20% 80%, rgba(59,130,246,0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(147,51,234,0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(236,72,153,0.05) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: 0;
+          animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
         .offers-header {
-          background: rgba(255, 255, 255, 0.1);
-          backdrop-filter: blur(10px);
-          border-radius: 20px;
-          padding: 3rem 2rem;
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(20px);
+          border-radius: 25px;
+          padding: 4rem 2rem;
           margin-bottom: 3rem;
           text-align: center;
           color: white;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+          position: relative;
+          overflow: hidden;
         }
+
+        .offers-header::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(124,58,237,0.1));
+          z-index: -1;
+        }
+
+        .offers-header h1 {
+          font-size: 3.5rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, #ffffff, #e0e7ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-shadow: 0 4px 30px rgba(255,255,255,0.3);
+          margin-bottom: 1rem;
+        }
+
+        .offers-header p {
+          font-size: 1.3rem;
+          color: #cbd5e1;
+          font-weight: 400;
+        }
+
         .offer-card {
           background: rgba(255, 255, 255, 0.95);
-          border-radius: 20px;
+          backdrop-filter: blur(20px);
+          border-radius: 25px;
           overflow: hidden;
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-          transition: all 0.3s ease;
+          box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           height: 100%;
-          border: none;
+          border: 1px solid rgba(255,255,255,0.2);
+          position: relative;
         }
+
         .offer-card:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+          transform: translateY(-15px) scale(1.02);
+          box-shadow: 0 25px 60px rgba(37,99,235,0.2);
         }
+
         .offer-image {
-          height: 200px;
+          height: 220px;
           background-size: cover;
           background-position: center;
           position: relative;
+          overflow: hidden;
         }
+
+        .offer-image::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(45deg, rgba(37,99,235,0.3), rgba(124,58,237,0.3));
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: 1;
+        }
+
+        .offer-card:hover .offer-image::before {
+          opacity: 1;
+        }
+
         .discount-badge {
           position: absolute;
-          top: 15px;
-          right: 15px;
-          background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+          top: 20px;
+          right: 20px;
+          background: linear-gradient(135deg, #dc2626, #ef4444);
           color: white;
-          padding: 8px 12px;
-          border-radius: 20px;
-          font-weight: bold;
-          font-size: 0.9rem;
-          box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+          padding: 10px 20px;
+          border-radius: 25px;
+          font-weight: 700;
+          font-size: 1rem;
+          box-shadow: 0 4px 15px rgba(220,38,38,0.3);
+          z-index: 2;
+          animation: slideInRight 0.6s ease-out;
         }
+
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
         .price-section {
-          background: linear-gradient(45deg, #667eea, #764ba2);
+          background: linear-gradient(135deg, #2563eb, #7c3aed);
           color: white;
-          padding: 1rem;
+          padding: 1.5rem;
           text-align: center;
+          position: relative;
+          overflow: hidden;
         }
+
+        .price-section::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+          transition: left 0.5s;
+        }
+
+        .price-section:hover::before {
+          left: 100%;
+        }
+
         .original-price {
           text-decoration: line-through;
           opacity: 0.7;
-          font-size: 0.9rem;
+          font-size: 1rem;
+          font-weight: 500;
         }
+
         .discounted-price {
-          font-size: 1.5rem;
-          font-weight: bold;
-          margin-left: 10px;
+          font-size: 1.8rem;
+          font-weight: 700;
+          margin-left: 15px;
         }
+
         .offer-features {
           list-style: none;
           padding: 0;
-          margin: 1rem 0;
+          margin: 1.5rem 0;
         }
+
         .offer-features li {
-          padding: 0.5rem 0;
-          border-bottom: 1px solid #f0f0f0;
-          color: #666;
+          padding: 0.75rem 0;
+          border-bottom: 1px solid #f1f5f9;
+          color: #475569;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
         }
+
         .offer-features li:last-child {
           border-bottom: none;
         }
+
+        .offer-features li::before {
+          content: '✓';
+          color: #2563eb;
+          font-weight: bold;
+          margin-right: 10px;
+          font-size: 1.1rem;
+        }
+
         .rent-btn {
-          background: linear-gradient(45deg, #667eea, #764ba2);
+          background: linear-gradient(135deg, #2563eb, #7c3aed);
           border: none;
           border-radius: 25px;
-          padding: 0.75rem 2rem;
-          font-weight: bold;
+          padding: 1rem 2rem;
+          font-weight: 600;
+          font-size: 1.1rem;
           transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
         }
+
+        .rent-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transition: left 0.5s;
+        }
+
+        .rent-btn:hover::before {
+          left: 100%;
+        }
+
         .rent-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(37,99,235,0.3);
         }
+
         .rating-badge {
-          background: #ffd700;
-          color: #333;
-          padding: 4px 8px;
-          border-radius: 12px;
-          font-size: 0.8rem;
-          font-weight: bold;
-        }
-        .valid-until {
-          color: #666;
+          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          color: #1f2937;
+          padding: 8px 15px;
+          border-radius: 20px;
+          font-weight: 600;
           font-size: 0.9rem;
-          display: flex;
-          align-items: center;
-          gap: 5px;
+          box-shadow: 0 4px 15px rgba(251,191,36,0.3);
         }
+
         .car-type-badge {
-          background: linear-gradient(45deg, #667eea, #764ba2);
+          background: linear-gradient(135deg, #2563eb, #7c3aed);
           color: white;
-          padding: 4px 12px;
-          border-radius: 15px;
-          font-size: 0.8rem;
-          font-weight: bold;
+          padding: 8px 20px;
+          border-radius: 20px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          box-shadow: 0 4px 15px rgba(37,99,235,0.2);
+        }
+
+        .valid-until {
+          color: #64748b;
+          font-size: 0.95rem;
+          font-weight: 500;
+        }
+
+        .add-offer-btn {
+          background: linear-gradient(135deg, #2563eb, #7c3aed);
+          border: none;
+          border-radius: 25px;
+          padding: 1rem 2rem;
+          color: white;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .add-offer-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transition: left 0.5s;
+        }
+
+        .add-offer-btn:hover::before {
+          left: 100%;
+        }
+
+        .add-offer-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(37,99,235,0.3);
+        }
+
+        /* Floating animation for cards */
+        .floating {
+          animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        /* Glow effect for important elements */
+        .glow {
+          box-shadow: 0 0 20px rgba(37,99,235,0.3);
+        }
+
+        .glow:hover {
+          box-shadow: 0 0 30px rgba(37,99,235,0.5);
         }
       `}</style>
 
@@ -200,8 +409,8 @@ function Offers() {
           <div className="offers-header">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <h1 className="display-4 fw-bold mb-3">Special Offers & Deals</h1>
-                <p className="lead mb-0">
+                <h1 className="mb-3">Special Offers & Deals</h1>
+                <p className="mb-0">
                   Discover amazing discounts and exclusive deals on car rentals
                 </p>
               </div>
@@ -210,15 +419,6 @@ function Offers() {
                   as={Link} 
                   to="/admin/offers" 
                   className="add-offer-btn"
-                  style={{
-                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
-                    border: 'none',
-                    borderRadius: '25px',
-                    padding: '0.75rem 2rem',
-                    color: 'white',
-                    fontWeight: '600',
-                    transition: 'all 0.3s ease'
-                  }}
                 >
                   <Plus size={20} className="me-2" />
                   Manage Offers
@@ -292,9 +492,10 @@ function Offers() {
                     </ul>
 
                     <Button 
-                      className="rent-btn w-100"
+                      className="rent-btn w-100 glow"
                       onClick={() => handleRentNow(offer)}
                     >
+                      <i className="bi bi-car-front me-2"></i>
                       Rent Now
                     </Button>
                   </Card.Body>
@@ -324,4 +525,4 @@ function Offers() {
   );
 }
 
-export default Offers; 
+export default Offers;

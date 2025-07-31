@@ -8,6 +8,7 @@ import AppNavbar from "./components/AppNavbar";
 import AddCar from "./pages/AddCar";
 import EditCar from "./pages/UpdateCar";
 import RentForm from "./pages/RentForn";
+import OfferRentForm from "./pages/OfferRentForm";
 import Notifications from "./pages/Notifications";
 import NotificationsUser from "./pages/NotificationsUser";
 import Comments from "./pages/Comments";
@@ -26,6 +27,7 @@ import AdminOffers from "./pages/AdminOffers";
 import AdminAddOffer from "./pages/AdminAddOffer";
 import AdminEditOffer from "./pages/AdminEditOffer";
 import AdminComments from "./pages/AdminComments";
+import AdminOfferRequests from "./pages/AdminOfferRequests";
 
 import { useState, useEffect } from 'react';
 import AdminRoute from "./components/AdminRoute";
@@ -62,6 +64,7 @@ function App() {
           < EditCar/>
         </AdminRoute>} />
           <Route path="/rent/:carId" element={<RentForm />} />
+          <Route path="/offer-rent/:offerId" element={<OfferRentForm />} />
           <Route path="/notifications" element={<AdminRoute user={user}>
           <Notifications />
         </AdminRoute> } />
@@ -90,6 +93,9 @@ function App() {
         </AdminRoute> } />
           <Route path="/admin/comments" element={<AdminRoute user={user}>
           <AdminComments />
+        </AdminRoute> } />
+          <Route path="/admin/offer-requests" element={<AdminRoute user={user}>
+          <AdminOfferRequests />
         </AdminRoute> } />
           
           
