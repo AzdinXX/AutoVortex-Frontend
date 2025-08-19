@@ -320,7 +320,7 @@ useEffect(() => {
     animation: slideInUp 1s ease-out 0.2s both;
     line-height: 1.6;
     max-width: 800px;
-    margin: 0 auto 2rem;
+    margin: 0 auto 4rem;
     padding: 0 1rem;
     word-wrap: break-word;
     hyphens: auto;
@@ -402,7 +402,7 @@ useEffect(() => {
     gap: 1rem;
     justify-content: center;
     align-items: center;
-    margin-top: 2rem;
+    margin-top: 3rem;
   }
 
   @media (max-width: 768px) {
@@ -843,9 +843,31 @@ useEffect(() => {
       <section className="hero-section">
         <Container className="text-center">
           <div className="hero-content">
-            <h1 className="hero-title mb-4">Rent the Best Cars</h1>
-            <p className="hero-subtitle mb-5">Premium vehicles at affordable prices with exclusive discounts</p>
-            <div className="hero-buttons">
+           <h1
+        className="hero-title mb-4"
+        style={{
+          marginTop: '15rem', 
+          transition: 'margin 0.3s'
+        }}
+      >
+        Rent the Best Cars
+      </h1>
+            <p
+              className="hero-subtitle mb-5"
+              style={{
+                marginTop: '5rem', 
+                marginBottom: '10rem', 
+                transition: 'margin 3.3s'
+              }}
+            >
+              Premium vehicles at affordable prices with exclusive discounts
+            </p>
+            <div
+              className="hero-buttons"
+              style={{
+                marginTop: '2.5rem' 
+              }}
+            >
               <Button as={Link} to="/auto_options" variant="primary" size="lg" className="glow">
                 <i className="bi bi-car-front" aria-hidden="true"></i>
                 <span>Browse Cars</span>
@@ -903,7 +925,6 @@ useEffect(() => {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Background decorative elements */}
         <div className="section-bg-elements">
           <div style={{
             position: 'absolute',
@@ -1182,8 +1203,38 @@ useEffect(() => {
             }}></div>
           </div>
           <Row>
-                        <Col md={4} className="text-center mb-4">
-              <div className="feature-icon">
+            <Col md={4} className="text-center mb-4">
+              <div className="feature-image mb-3" style={{
+                width: '200px',
+                height: '150px',
+                margin: '0 auto',
+                borderRadius: '15px',
+                overflow: 'hidden',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+              }}>
+                <img 
+                  src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=300&fit=crop" 
+                  alt="Wide Selection of Cars"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.parentElement.style.transform = 'translateY(-5px)';
+                    e.target.parentElement.style.boxShadow = '0 15px 40px rgba(37,99,235,0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.parentElement.style.transform = 'translateY(0)';
+                    e.target.parentElement.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                  }}
+                />
+              </div>
+              <div>
                 <i className="bi bi-car-front"></i>
               </div>
               <h3 className="text-white fw-bold" style={{ fontSize: '1.8rem', letterSpacing: '1px', marginBottom: '1rem' }}>
@@ -1196,7 +1247,37 @@ useEffect(() => {
               </div>
             </Col>
             <Col md={4} className="text-center mb-4">
-              <div className="feature-icon">
+              <div className="feature-image mb-3" style={{
+                width: '200px',
+                height: '150px',
+                margin: '0 auto',
+                borderRadius: '15px',
+                overflow: 'hidden',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+              }}>
+                <img 
+                  src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop" 
+                  alt="Affordable Prices"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.parentElement.style.transform = 'translateY(-5px)';
+                    e.target.parentElement.style.boxShadow = '0 15px 40px rgba(37,99,235,0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.parentElement.style.transform = 'translateY(0)';
+                    e.target.parentElement.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                  }}
+                />
+              </div>
+              <div>
                 <i className="bi bi-currency-dollar"></i>
               </div>
               <h3 className="text-white fw-bold" style={{ fontSize: '1.8rem', letterSpacing: '1px', marginBottom: '1rem' }}>
@@ -1209,7 +1290,37 @@ useEffect(() => {
               </div>
             </Col>
             <Col md={4} className="text-center mb-4">
-              <div className="feature-icon">
+              <div className="feature-image mb-3" style={{
+                width: '200px',
+                height: '150px',
+                margin: '0 auto',
+                borderRadius: '15px',
+                overflow: 'hidden',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+              }}>
+                <img 
+                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop" 
+                  alt="Easy Booking"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.parentElement.style.transform = 'translateY(-5px)';
+                    e.target.parentElement.style.boxShadow = '0 15px 40px rgba(37,99,235,0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.parentElement.style.transform = 'translateY(0)';
+                    e.target.parentElement.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+                  }}
+                />
+              </div>
+              <div>
                 <i className="bi bi-calendar-check"></i>
               </div>
               <h3 className="text-white fw-bold" style={{ fontSize: '1.8rem', letterSpacing: '1px', marginBottom: '1rem' }}>
